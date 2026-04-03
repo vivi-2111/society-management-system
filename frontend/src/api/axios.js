@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+// Make sure it ends in /api
+let baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+if (baseURL && !baseURL.endsWith('/api')) {
+    baseURL = baseURL.replace(/\/$/, '') + '/api';
+}
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api', // adjust if backend runs on a different port
+    baseURL,
+    headers: {
+        'ngrok-skip-browser-warning': 'true' // bypasses the ngrok free tier HTML warning
+    }
 });
 
 // Interceptor to attach the token to every request
