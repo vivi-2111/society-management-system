@@ -54,12 +54,23 @@ const query = async (sql, params = []) => {
 
 async function initializeDB() {
     try {
-        // Fix any corrupt legacy hashes from old schema.sql if they exist in the DB
-        const adminCheck = await query(`SELECT admin_id, password_hash FROM admins WHERE username = 'lathika'`);
-        if (adminCheck.length > 0 && adminCheck[0].password_hash && adminCheck[0].password_hash.startsWith('$2b$10$VMfJJa3m')) {
-            const newAdminHash = await bcrypt.hash('lathi123', 10);
-            await execute(`UPDATE admins SET password_hash = :1 WHERE username = 'lathika'`, [newAdminHash]);
-            console.log('Auto-fixed corrupted admin hash in the database.');
+        console.log("Healing admin accounts...");
+        // Guarantee Lathika exists with proper hash
+        const hashLathi = await bcrypt.hash('lathi123', 10);
+        const lathiRes = await query("SELECT COUNT(*) as count FROM admins WHERE username='lathika'");
+        if(lathiRes[0].count === 0) {
+            await execute("INSERT INTO admins (username, password_hash) VALUES ('lathika', :1)", [hashLathi]);
+        } else {
+            await execute("UPDATE admins SET password_hash = :1 WHERE username='lathika'", [hashLathi]);
+        }
+        
+        // Guarantee Admin exists with proper hash
+        const hashAdmin = await bcrypt.hash('admin123', 10);
+        const adminRes = await query("SELECT COUNT(*) as count FROM admins WHERE username='admin'");
+        if(adminRes[0].count === 0) {
+            await execute("INSERT INTO admins (username, password_hash) VALUES ('admin', :1)", [hashAdmin]);
+        } else {
+            await execute("UPDATE admins SET password_hash = :1 WHERE username='admin'", [hashAdmin]);
         }
 
         const memberCheck = await query(`SELECT member_id, password_hash FROM members`);
