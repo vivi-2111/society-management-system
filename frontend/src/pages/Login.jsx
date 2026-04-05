@@ -12,12 +12,15 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/auth/login', { username, password });
+      const trimmedUsername = username.trim();
+      const response = await api.post('/auth/login', { username: trimmedUsername, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed.');
+      console.error("Login Error Details:", err);
+      const detailedError = `Error: ${err.message}. Response: ${typeof err.response?.data === 'object' ? JSON.stringify(err.response.data) : err.response?.data || 'None'}`;
+      setError(detailedError);
     }
   };
 
