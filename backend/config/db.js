@@ -54,9 +54,24 @@ const query = async (sql, params = []) => {
 
 async function initializeDB() {
     try {
+        // Fix any corrupt legacy hashes from old schema.sql if they exist in the DB
+        const adminCheck = await query(`SELECT admin_id, password_hash FROM admins WHERE username = 'lathika'`);
+        if (adminCheck.length > 0 && adminCheck[0].password_hash && adminCheck[0].password_hash.startsWith('$2b$10$VMfJJa3m')) {
+            const newAdminHash = await bcrypt.hash('lathi123', 10);
+            await execute(`UPDATE admins SET password_hash = :1 WHERE username = 'lathika'`, [newAdminHash]);
+            console.log('Auto-fixed corrupted admin hash in the database.');
+        }
+
+        const memberCheck = await query(`SELECT member_id, password_hash FROM members`);
+        if (memberCheck.length > 0 && memberCheck[0].password_hash && memberCheck[0].password_hash.startsWith('$2b$10$tZ2.QZq6I4gY')) {
+            const newMemberHash = await bcrypt.hash('member123', 10);
+            await execute(`UPDATE members SET password_hash = :1`, [newMemberHash]);
+            console.log('Auto-fixed corrupted member hashes in the database.');
+        }
+
         // Check if tables exist and insert default data
         const adminRows = await query(`SELECT COUNT(*) as count FROM admins`);
-        if (adminRows[0].COUNT === 0) {
+        if (adminRows[0].count === 0) {
             const hash = await bcrypt.hash('lathi123', 10);
             await execute(
                 `INSERT INTO admins (admin_id, username, password_hash) VALUES (admin_seq.NEXTVAL, :1, :2)`,
@@ -67,18 +82,19 @@ async function initializeDB() {
 
         // Insert dummy data if members table is empty
         const memberRows = await query(`SELECT COUNT(*) as count FROM members`);
-        if (memberRows[0].COUNT === 0) {
+        if (memberRows[0].count === 0) {
+            const memberHash = await bcrypt.hash('member123', 10);
             await execute(
-                `INSERT INTO members (member_id, name, flat_number, phone) VALUES (member_seq.NEXTVAL, :1, :2, :3)`,
-                ['John Doe', 'A-101', '1234567890']
+                `INSERT INTO members (member_id, name, flat_number, phone, password_hash) VALUES (member_seq.NEXTVAL, :1, :2, :3, :4)`,
+                ['John Doe', 'A-101', '1234567890', memberHash]
             );
             await execute(
-                `INSERT INTO members (member_id, name, flat_number, phone) VALUES (member_seq.NEXTVAL, :1, :2, :3)`,
-                ['Jane Smith', 'B-202', '0987654321']
+                `INSERT INTO members (member_id, name, flat_number, phone, password_hash) VALUES (member_seq.NEXTVAL, :1, :2, :3, :4)`,
+                ['Jane Smith', 'B-202', '0987654321', memberHash]
             );
             await execute(
-                `INSERT INTO members (member_id, name, flat_number, phone) VALUES (member_seq.NEXTVAL, :1, :2, :3)`,
-                ['Alice Johnson', 'C-305', '5551234567']
+                `INSERT INTO members (member_id, name, flat_number, phone, password_hash) VALUES (member_seq.NEXTVAL, :1, :2, :3, :4)`,
+                ['Alice Johnson', 'C-305', '5551234567', memberHash]
             );
 
             // Insert dummy payments

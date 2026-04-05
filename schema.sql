@@ -74,12 +74,12 @@ CREATE TABLE expenses (
 
 -- Insert sample admin (password is 'lathi123' generated with bcrypt)
 INSERT INTO admins (username, password_hash) 
-VALUES ('lathika', '$2b$10$VMfJJa3m.1WbohKs9W0PINTGmD.LvsX0piwyDfY3lcZJSpTI');
+VALUES ('lathika', '$2b$10$WSrmUem1KzuyeBYHFhVVGO9r6ccazB7zCeYqvL1f7nHgXEbh2iSiW');
 
 -- Insert sample members
-INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('John Doe', 'A-101', '1234567890', '$2b$10$tZ2.QZq6I4gYg6N2B1MZXuD8E5F3sXGZ4cE1HlHkJ5K5N8L9M0O6m'); -- 'member123'
-INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('Jane Smith', 'B-202', '0987654321', '$2b$10$tZ2.QZq6I4gYg6N2B1MZXuD8E5F3sXGZ4cE1HlHkJ5K5N8L9M0O6m'); -- 'member123'
-INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('Alice Johnson', 'C-305', '5551234567', '$2b$10$tZ2.QZq6I4gYg6N2B1MZXuD8E5F3sXGZ4cE1HlHkJ5K5N8L9M0O6m'); -- 'member123'
+INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('John Doe', 'A-101', '1234567890', '$2b$10$16RYfL3kIpbXevBXbj579OlSq1o3iQSSlR84p9.kv/zE02qpF5onO'); -- 'member123'
+INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('Jane Smith', 'B-202', '0987654321', '$2b$10$16RYfL3kIpbXevBXbj579OlSq1o3iQSSlR84p9.kv/zE02qpF5onO'); -- 'member123'
+INSERT INTO members (name, flat_number, phone, password_hash) VALUES ('Alice Johnson', 'C-305', '5551234567', '$2b$10$16RYfL3kIpbXevBXbj579OlSq1o3iQSSlR84p9.kv/zE02qpF5onO'); -- 'member123'
 
 -- Insert sample payments
 INSERT INTO payments (member_id, amount, month_year, status, payment_date) 
